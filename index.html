@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terminal...</title>
+  <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
+  <link rel="shortcut icon" href="/favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Terminal..." />
+  <link rel="manifest" href="/favicons/site.webmanifest" />
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Power-on Screen */
+    #power-screen {
+      position: absolute;
+      inset: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1s ease-in-out;
+      z-index: 1000;
+    }
+
+    #turn-on-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      user-select: none; /* Prevent text selection */
+      pointer-events: auto; /* Make sure it is clickable initially */
+    }
+
+    #turn-on-button img {
+      width: 200px;
+      height: 200px;
+      filter: drop-shadow(0 0 10px #00ff00);
+      transition: transform 0.2s;
+    }
+
+    #turn-on-button img:hover {
+      transform: scale(1.1);
+    }
+
+    .fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #terminal {
+      white-space: pre-wrap;
+      padding: 30px;
+      display: none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .glitch {
+      display: inline-block;
+      animation: glitch 0.3s infinite;
+    }
+
+    .error {
+      color: red;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 1px 0 red, -1px 0 blue; }
+      25% { text-shadow: -1px -1px lime, 1px 1px magenta; }
+      50% { text-shadow: 2px 0 red, -2px 0 blue; }
+      75% { text-shadow: -1px 1px cyan, 1px -1px yellow; }
+      100% { text-shadow: 0 0 white; }
+    }
+
+    /* CRT Overlay */
+    #crt-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      background: 
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 100%),
+        repeating-linear-gradient(
+          to bottom,
+          rgba(0, 255, 0, 0.03),
+          rgba(0, 255, 0, 0.03) 2px,
+          transparent 2px,
+          transparent 4px
+        );
+      mix-blend-mode: screen;
+      animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+      }
+      20%, 22%, 24%, 55% {
+        opacity: 0.9;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Power On Screen -->
+  <div id="power-screen">
+    <button id="turn-on-button" title="Power On">
+      <img src="https://cdn3.iconfinder.com/data/icons/miniglyphs/500/059-512.png" alt="Power Button Icon"/>
+    </button>
+  </div>
+
+  <!-- CRT Overlay -->
+  <div id="crt-overlay"></div>
+
+  <!-- Terminal Output -->
+  <div id="terminal"></div>
+
+  <!-- Sound Effects -->
+  <audio id="power-sound" src="Audio/Power.wav" preload="auto"></audio>
+  <audio id="error-sound" src="Audio/Error.wav" preload="auto"></audio>
+
+  <script>
+    const messages = [
+      "Booting system...",
+      "Checking CPU... OK",
+      "Verifying Memory... OK",
+      "Initializing GPU... OK",
+      "Loading User Modules... OK",
+      {  error: true, text: "RAM Fault Detected... RETRYING" },
+      "Retry Successful... OK",
+      { error: true, text: "Account Permissions Error... BYPASSING"},
+      "Establishing Secure Connection... OK",
+      "Boot sequence complete."
+    ];
+
+    const redirectUrl = "/Desktop"; // Replace this
+    let currentMessageIndex = 0;
+    const terminal = document.getElementById("terminal");
+
+    const powerBtn = document.getElementById("turn-on-button");
+    const powerScreen = document.getElementById("power-screen");
+    const powerSound = document.getElementById("power-sound");
+    const errorSound = document.getElementById("error-sound");
+
+    function glitchEffect(text, isError = false) {
+      let styled = '';
+      for (let char of text) {
+        styled += `<span class="${isError ? 'glitch error' : 'glitch'}">${char}</span>`;
+      }
+      return styled;
+    }
+
+    function typeWriterEffect(messageObj, index = 0) {
+      const { text, error } = typeof messageObj === 'string' ? { text: messageObj, error: false } : messageObj;
+
+      if (index < text.length) {
+        terminal.innerHTML += glitchEffect(text.charAt(index), error);
+        index++;
+        setTimeout(() => typeWriterEffect(messageObj, index), 50);
+      } else {
+        terminal.innerHTML += '\n';
+        if (error) errorSound.play();
+        if (currentMessageIndex < messages.length - 1) {
+          currentMessageIndex++;
+          setTimeout(displayNextMessage, 400);
+        } else {
+          showPressEnter();
+        }
+      }
+    }
+
+    function animateTitleEffect(message, index = 0) {
+      if (index < message.length) {
+        document.title = message.substring(0, index + 1);
+        setTimeout(() => animateTitleEffect(message, index + 1), 50); // Adjust the speed here
+      }
+    }
+
+    function displayNextMessage() {
+      const msg = messages[currentMessageIndex];
+      const { text } = typeof msg === 'string' ? { text: msg } : msg;
+      
+      animateTitleEffect(text);  // Update the title with a typewriter effect
+      typeWriterEffect(msg);     // Type the message in the terminal
+    }
+
+    function showPressEnter() {
+      terminal.innerHTML += '\nPress Enter to continue...';
+      document.addEventListener("keydown", handleEnterKey);
+    }
+
+    function handleEnterKey(e) {
+      if (e.key === "Enter") {
+        window.location.href = redirectUrl;
+      }
+    }
+
+    powerBtn.addEventListener("click", () => {
+      powerSound.play();
+      powerScreen.classList.add("fade-out");
+      powerBtn.style.pointerEvents = "none"; // Disable interaction after click
+      powerBtn.style.opacity = 0.5; // Optional: Dim the button
+      setTimeout(() => {
+        powerScreen.style.display = "none";
+        terminal.style.display = "block";
+        displayNextMessage();
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>

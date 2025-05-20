@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desktop</title>
+  <link rel="icon" type="image/png" href="/Desktop/favicons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/Desktop/favicons/favicon.svg" />
+  <link rel="shortcut icon" href="/Desktop/favicons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/Desktop/favicons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Desktop" />
+  <link rel="manifest" href="/Desktop/favicons/site.webmanifest" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: rgb(0, 0, 58);">
+    <h1 style="text-align: center; color: darkred;">THIS PAGE IS WORK-IN-PROGRESS AND ITS JUST A REALLY BAD PREVIEW :D It will look really cool when i fully develope it. Promise!</h1>
+  <!-- Desktop layout -->
+  <div id="desktop">
+    <!-- App Icons -->
+    <div class="desktop-icon" id="icon-terminal">
+      <a href="https://townscapergame.github.io/"><img src="https://itsdenji777.github.io/Games/img/TS.svg" alt="Ts"/></a>
+      <p>TownScaper</p>
+    </div>
+    <div class="desktop-icon" id="meh">
+      <img src="nullfile.svg" alt="WIP"/>
+      <p>WIP</p>
+    </div>
+    <div class="desktop-icon" id="idk">
+      <img src="nullfile.svg" alt="WIP"/>
+      <p>WIP</p>
+    </div>
+  </div>
+
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <div class="taskbar-button" id="start-button">Start Menu</div>
+    <div id="system-tray">
+      <div id="clock"></div>
+    </div>
+  </div>
+
+  <!-- Start Menu -->
+  <div class="start-menu" id="start-menu">
+    <button id="open-terminal">Hi</button>
+    <button id="open-notepad">This Webpage</button>
+    <button id="open-browser">Is Work-In-Progress</button>
+  </div>
+
+  <!-- Windows -->
+  <div class="window" id="terminal-window">
+    <div class="window-header">
+      <span>Terminal</span>
+      <span class="close" id="close-terminal">X</span>
+    </div>
+    <div class="window-content">
+      <p>Welcome to the terminal...</p>
+    </div>
+  </div>
+
+  <div class="window" id="notepad-window">
+    <div class="window-header">
+      <span>Notepad</span>
+      <span class="close" id="close-notepad">X</span>
+    </div>
+    <div class="window-content">
+      <textarea rows="10" style="width: 100%; height: 100%;">Write something...</textarea>
+    </div>
+  </div>
+
+  <div class="window" id="browser-window">
+    <div class="window-header">
+      <span>Browser</span>
+      <span class="close" id="close-browser">X</span>
+    </div>
+    <div class="window-content">
+      <p>Opening the web...</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
